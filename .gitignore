@@ -39,7 +39,6 @@
 # JIRA plugin
 atlassian-ide-plugin.xml
 
-
 ### Intellij Patch ###
 # Comment Reason: https://github.com/joeblau/gitignore.io/issues/186#issuecomment-215987721
 
@@ -49,3 +48,7 @@ atlassian-ide-plugin.xml
 # *.ipr
 
 # End of https://www.gitignore.io/api/intellij
+
+# Temp testing files
+poster.*
+output.*
