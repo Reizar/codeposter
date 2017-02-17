@@ -5,6 +5,7 @@ package com.aaronrama.codeposter;
  */
 
 import java.io.*;
+import java.nio.file.Path;
 import java.util.ArrayList;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -39,6 +40,9 @@ public class PosterMaker {
     @Parameter(names = "-comment-characters", description = "Comment characters to look for to strip from code")
     private String commentCharacters = "";
 
+    @Parameter(names = "-code-file-extension", description = "Only files with this extension will be loaded when providing an input directory")
+    private String codeFileExtension = "";
+
     @Parameter(names = "-image", description = "Required - Path to input image.", required = true)
     private String imageFilePath;
 
@@ -68,7 +72,13 @@ public class PosterMaker {
         poster.ratio = 0.6f;
         poster.width = posterWidth;
         poster.height = posterHeight;
-        poster.codeCharacters = FileUtility.loadCodeFromFile(codeFilePath);
+
+        File file = new File(codeFilePath);
+        if (file.exists()) {
+          poster.codeCharacters = file.isFile() ? FileUtility.loadCodeFromFile(codeFilePath, commentCharacters) :
+                                                  FileUtility.loadCodeFromDirectory(codeFilePath, commentCharacters, codeFileExtension);
+        }
+
         poster.pixelHexes = FileUtility.loadImagePixelsFromFile(imageFilePath);
 
         // Inefficiently pad the code characters list so that there is guaranteed to be enough
@@ -173,7 +183,7 @@ public class PosterMaker {
                 ostream.close();
             }
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
         }
     }
 

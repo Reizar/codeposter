@@ -7,17 +7,32 @@ import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 /**
  * Created by aaron on 15/02/17.
  */
 public class FileUtility {
 
-    public static String[] loadCodeFromFile(String path) throws IOException {
+    public static String[] loadCodeFromFile(String path, String commentChars) throws IOException {
         String fileContents = readFile(path);
-        String cleanedFile = fileContents.trim().replaceAll("\\s*\\n+\\s*", " ").replaceAll("\\s", " ");
+        String cleanedFile = cleanCodeFile(fileContents, commentChars);
         return cleanedFile.split("");
+    }
+
+    public static String[] loadCodeFromDirectory(String path, String commentChars, String fileExt) throws IOException {
+        String condensedInput =  Files.walk(Paths.get(path))
+                                      .filter(Files::isRegularFile)
+                                      .filter(path1 -> path1.toString().endsWith(fileExt))
+                                      .map(path1 -> readFile(path1.toString()))
+                                      .map(fileContents -> cleanCodeFile(fileContents, commentChars))
+                                      .reduce("", String::concat);
+
+        return condensedInput.split("");
     }
 
     public static String[][] loadImagePixelsFromFile(String path) throws IOException {
@@ -39,13 +54,11 @@ public class FileUtility {
                 int blue = (pixels[pixel + 1]) & 0xff;
                 int green = (pixels[pixel + 2]) & 0xff;
                 int red = (pixels[pixel + 3]) & 0xff;
-
                 result[row][col] = ColourUtility.rgbaToHex(red, green, blue, alpha);
             } else {
                 int blue = (pixels[pixel]) & 0xff;
                 int green = (pixels[pixel + 1]) & 0xff;
                 int red = (pixels[pixel + 2]) & 0xff;
-
                 result[row][col] = ColourUtility.rgbToHex(red, green, blue);
             }
 
@@ -59,8 +72,24 @@ public class FileUtility {
         return result;
     }
 
-    private static String readFile(String path) throws IOException {
-        return new String(Files.readAllBytes(Paths.get(path)));
+    private static String readFile(String path) {
+        try {
+            return new String(Files.readAllBytes(Paths.get(path)));
+        } catch (IOException e) {
+            System.out.println("Error reading inputted code file");
+            System.exit(0);
+
+            return "";
+        }
+    }
+
+    private static String cleanCodeFile(String code, String commentChars) {
+        if (commentChars.length() > 0) {
+            code = code.replaceAll(commentChars + ".*?\n","\n");
+        }
+        return code.trim()
+                   .replaceAll("\\s*\\n+\\s*", " ")
+                   .replaceAll("\\s", " ");
     }
 
     private static BufferedImage resizeImage(BufferedImage inputImage) {
@@ -68,7 +97,6 @@ public class FileUtility {
         int scaledHeight = inputImage.getHeight();
         BufferedImage outputImage = new BufferedImage(scaledWidth, scaledHeight, inputImage.getType());
 
-        // scales the input image to the output image
         Graphics2D g2d = outputImage.createGraphics();
         g2d.drawImage(inputImage, 0, 0, scaledWidth, scaledHeight, null);
         g2d.dispose();
