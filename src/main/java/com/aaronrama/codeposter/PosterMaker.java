@@ -4,9 +4,12 @@ package com.aaronrama.codeposter;
  * Created by aaron on 15/02/17.
  */
 
+import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.io.*;
 import java.nio.file.Path;
 import java.util.ArrayList;
+import javax.imageio.ImageIO;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.transform.OutputKeys;
@@ -184,6 +187,34 @@ public class PosterMaker {
             }
         } catch (Exception e) {
 //            e.printStackTrace();
+        }
+    }
+
+    private void manuallyDrawImage() {
+        int imageWidth = poster.pixelHexes[0].length;
+        int imageHeight = poster.pixelHexes.length;
+
+        BufferedImage bi = new BufferedImage(posterWidth, posterHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D context = bi.createGraphics();
+
+        float widthScale = (posterWidth / imageWidth) / poster.ratio;
+        float heightScale = posterHeight / imageHeight;
+        Font font = new Font("Source Code Pro", Font.BOLD, (int)widthScale);
+        context.setFont(font);
+
+        for (TextElement el : poster.textElements) {
+            Color color = Color.decode(el.hex);
+            context.setColor(color);
+
+            float x = el.x * widthScale;
+            float y = el.y * heightScale;
+            context.drawString(el.text, x, y);
+        }
+
+        try {
+            ImageIO.write(bi, "PNG", new File("test.png"));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
 
