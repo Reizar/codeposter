@@ -56,7 +56,6 @@ public class PosterMaker {
 
     private void createPoster() throws IOException {
         this.poster = new Poster();
-        poster.ratio = 0.6f;
         poster.width = posterWidth;
         poster.height = posterHeight;
 
@@ -90,7 +89,7 @@ public class PosterMaker {
         BufferedImage bi = new BufferedImage(posterWidth, posterHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D context = bi.createGraphics();
 
-        float widthScale = (posterWidth / imageWidth);
+        float widthScale = posterWidth / imageWidth;
         float heightScale = posterHeight / imageHeight;
         Font font = new Font("Source Code Pro", Font.BOLD, (int)heightScale);
         context.setFont(font);

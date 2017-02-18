@@ -12,5 +12,4 @@ public class Poster {
     public String[] codeCharacters;
     public int width;
     public int height;
-    public float ratio;
 }
