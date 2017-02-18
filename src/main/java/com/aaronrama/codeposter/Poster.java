@@ -4,8 +4,7 @@ package com.aaronrama.codeposter;
  * Created by aaron on 15/02/17.
  */
 
-import java.awt.*;
-import java.util.ArrayList;
+import java.awt.Color;
 
 public class Poster {
 
@@ -14,6 +13,4 @@ public class Poster {
     public int width;
     public int height;
     public float ratio;
-    public ArrayList<TextElement> textElements;
-    public String savePath;
 }
