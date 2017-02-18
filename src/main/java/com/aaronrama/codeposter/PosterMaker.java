@@ -42,7 +42,7 @@ public class PosterMaker {
     @Parameter(names = "-output-file", description = "Path / Filename for the output file. Default is ./poster.png")
     private String outputFilePath = "./poster.png";
 
-    @Parameter(names = "-output-format", description = "File format of outputted poster. Options are: PNG, JPG, SVG. Default is PNG")
+    @Parameter(names = "-output-format", description = "File format of outputted poster. Options are: PNG, JPG. Default is PNG")
     private String outputFileFormat = "PNG";
 
     private Poster poster;
@@ -110,7 +110,7 @@ public class PosterMaker {
         }
 
         try {
-            ImageIO.write(bi, "PNG", new File("test2.png"));
+            ImageIO.write(bi, outputFileFormat, new File(outputFilePath));
         } catch (IOException e) {
             e.printStackTrace();
         }
