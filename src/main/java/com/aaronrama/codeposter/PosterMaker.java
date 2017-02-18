@@ -96,98 +96,7 @@ public class PosterMaker {
             poster.codeCharacters = newChars;
         }
 
-        mergePixelsWithCode();
-        createXMLElements();
-    }
-
-    private void mergePixelsWithCode() {
-        int imageWidth = poster.pixelHexes[0].length;
-
-        ArrayList<TextElement> mappedRows = new ArrayList<TextElement>();
-
-        for (int y = 0; y < poster.pixelHexes.length; y++) {
-            String[] row = poster.pixelHexes[y];
-
-            ArrayList<TextElement> mappedRow = mapRow(y, imageWidth);
-            for (TextElement row1 : mappedRow) {
-                mappedRows.add(row1);
-            }
-        }
-
-        poster.textElements = mappedRows;
-    }
-
-    private ArrayList<TextElement> mapRow(int y, int imageWidth) {
-        String[] row = poster.pixelHexes[y];
-
-        ArrayList<TextElement> mappedRow  = new ArrayList<TextElement>();
-
-        for (int x = 0; x < row.length; x ++) {
-            String character = poster.codeCharacters[y * imageWidth + x];
-            String hex = row[x];
-
-            if (!mappedRow.isEmpty() && mappedRow.get(mappedRow.size() - 1).hex.equals(hex)) {
-                mappedRow.get(mappedRow.size() - 1).text += character;
-            } else {
-                TextElement mappedNode = new TextElement(character, x * poster.ratio, y, hex);
-                mappedRow.add(mappedNode);
-            }
-        }
-        return mappedRow;
-    }
-
-    private void createXMLElements() {
-        int imageWidth = poster.pixelHexes[0].length;
-        int imageHeight = poster.pixelHexes.length;
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder;
-
-        try {
-            docBuilder = docFactory.newDocumentBuilder();
-            Document doc = docBuilder.newDocument();
-            Element root = doc.createElementNS("http://www.w3.org/2000/svg", "svg");
-            doc.appendChild(root);
-
-            root.setAttribute("viewBox", "0 0 " + (imageWidth * poster.ratio) + " " + imageHeight);
-            root.setAttribute("style", "font-family: 'Source Code Pro'; font-size: 1; font-weight: 900;");
-            root.setAttribute("width", "" + poster.width);
-            root.setAttribute("height", "" + poster.height);
-            root.setAttribute("xml:space", "preserve");
-
-            for (TextElement el : poster.textElements) {
-                Element textEl = doc.createElement("text");
-                textEl.appendChild(doc.createTextNode(el.text));
-                textEl.setAttribute("x", "" + el.x);
-                textEl.setAttribute("y", "" + el.y);
-                textEl.setAttribute("fill", el.hex);
-                root.appendChild(textEl);
-            }
-
-            Transformer transformer = TransformerFactory.newInstance().newTransformer();
-            transformer.setOutputProperty(OutputKeys.INDENT, "yes");
-            transformer.setOutputProperty(OutputKeys.ENCODING, "UTF-8");
-
-            if (outputFileFormat.equals("SVG")) {
-                transformer.transform(new DOMSource(doc), new StreamResult(new File(outputFilePath)));
-            } else {
-                StringWriter writer = new StringWriter();
-                transformer.transform(new DOMSource(doc), new StreamResult(writer));
-                String svgString = writer.getBuffer().toString();
-                InputStream inputStream = new ByteArrayInputStream(svgString.getBytes("UTF-8"));
-
-                ImageTranscoder t = outputFileFormat.equals("PNG") ? new PNGTranscoder() : new JPEGTranscoder();
-                TranscoderInput input = new TranscoderInput(inputStream);
-                OutputStream ostream = new FileOutputStream(outputFilePath);
-                TranscoderOutput output = new TranscoderOutput(ostream);
-
-                t.transcode(input, output);
-                ostream.flush();
-                ostream.close();
-            }
-        } catch (Exception e) {
-//            e.printStackTrace();
-        }
+        manuallyDrawImage();
     }
 
     private void manuallyDrawImage() {
@@ -197,22 +106,29 @@ public class PosterMaker {
         BufferedImage bi = new BufferedImage(posterWidth, posterHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D context = bi.createGraphics();
 
-        float widthScale = (posterWidth / imageWidth) / poster.ratio;
+        float widthScale = (posterWidth / imageWidth);
         float heightScale = posterHeight / imageHeight;
-        Font font = new Font("Source Code Pro", Font.BOLD, (int)widthScale);
+        Font font = new Font("Source Code Pro", Font.BOLD, (int)heightScale);
         context.setFont(font);
 
-        for (TextElement el : poster.textElements) {
-            Color color = Color.decode(el.hex);
-            context.setColor(color);
+        for (int y = 0; y < poster.pixelHexes.length; y++) {
+            String[] row = poster.pixelHexes[y];
 
-            float x = el.x * widthScale;
-            float y = el.y * heightScale;
-            context.drawString(el.text, x, y);
+            for (int x = 0; x < row.length; x++) {
+                String character = poster.codeCharacters[y * imageWidth + x];
+                String hex = row[x];
+
+                Color color = Color.decode(hex);
+                context.setColor(color);
+
+                float newX = x * widthScale;
+                float newY = y * heightScale;
+                context.drawString(character, newX, newY);
+            }
         }
 
         try {
-            ImageIO.write(bi, "PNG", new File("test.png"));
+            ImageIO.write(bi, "PNG", new File("test2.png"));
         } catch (IOException e) {
             e.printStackTrace();
         }
