@@ -65,11 +65,11 @@ public class PosterMaker {
                                                   FileUtility.loadCodeFromDirectory(codeFilePath, commentCharacters, codeFileExtension);
         }
 
-        poster.pixelHexes = FileUtility.loadImagePixelsFromFile(imageFilePath);
+        poster.pixels = FileUtility.loadImagePixelsFromFile(imageFilePath);
 
         // Inefficiently pad the code characters list so that there is guaranteed to be enough
         // characters to cover each pixel.
-        while ((poster.pixelHexes.length * poster.pixelHexes[0].length) > poster.codeCharacters.length) {
+        while ((poster.pixels.length * poster.pixels[0].length) > poster.codeCharacters.length) {
 
             String[] newChars = new String[poster.codeCharacters.length * 2];
 
@@ -83,8 +83,8 @@ public class PosterMaker {
     }
 
     private void manuallyDrawImage() {
-        int imageWidth = poster.pixelHexes[0].length;
-        int imageHeight = poster.pixelHexes.length;
+        int imageWidth = poster.pixels[0].length;
+        int imageHeight = poster.pixels.length;
 
         BufferedImage bi = new BufferedImage(posterWidth, posterHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D context = bi.createGraphics();
@@ -94,18 +94,17 @@ public class PosterMaker {
         Font font = new Font("Source Code Pro", Font.BOLD, (int)heightScale);
         context.setFont(font);
 
-        for (int y = 0; y < poster.pixelHexes.length; y++) {
-            String[] row = poster.pixelHexes[y];
+        for (int y = 0; y < poster.pixels.length; y++) {
+            Color[] row = poster.pixels[y];
 
             for (int x = 0; x < row.length; x++) {
                 String character = poster.codeCharacters[y * imageWidth + x];
-                String hex = row[x];
-
-                Color color = Color.decode(hex);
-                context.setColor(color);
+                Color color = row[x];
 
                 float newX = x * widthScale;
                 float newY = y * heightScale;
+
+                context.setColor(color);
                 context.drawString(character, newX, newY);
             }
         }

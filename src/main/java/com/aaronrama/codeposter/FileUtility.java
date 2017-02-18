@@ -1,8 +1,8 @@
 package com.aaronrama.codeposter;
 
 import javax.imageio.ImageIO;
+import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.awt.Graphics2D;
 import java.awt.image.DataBufferByte;
 import java.io.File;
 import java.io.IOException;
@@ -35,7 +35,7 @@ public class FileUtility {
         return condensedInput.split("");
     }
 
-    public static String[][] loadImagePixelsFromFile(String path) throws IOException {
+    public static Color[][] loadImagePixelsFromFile(String path) throws IOException {
         BufferedImage image = ImageIO.read(new File(path));
         image = resizeImage(image);
 
@@ -46,20 +46,20 @@ public class FileUtility {
         final int height = image.getHeight();
         final boolean hasAlphaChannel = image.getAlphaRaster() != null;
 
-        String[][] result = new String[height][width];
+        Color[][] result = new Color[height][width];
         final  int pixelLength = hasAlphaChannel ? 4 : 3;
         for (int pixel = 0, row = 0, col = 0; pixel < pixels.length; pixel += pixelLength) {
             if (hasAlphaChannel) {
-                int alpha = (pixels[pixel]) & 0xff;
-                int blue = (pixels[pixel + 1]) & 0xff;
-                int green = (pixels[pixel + 2]) & 0xff;
-                int red = (pixels[pixel + 3]) & 0xff;
-                result[row][col] = ColourUtility.rgbaToHex(red, green, blue, alpha);
+                int alpha = ColourUtility.normalize((pixels[pixel]) & 0xff);
+                int blue = ColourUtility.normalize((pixels[pixel + 1]) & 0xff);
+                int green = ColourUtility.normalize((pixels[pixel + 2]) & 0xff);
+                int red = ColourUtility.normalize((pixels[pixel + 3]) & 0xff);
+                result[row][col] = new Color(red, green, blue, alpha);
             } else {
-                int blue = (pixels[pixel]) & 0xff;
-                int green = (pixels[pixel + 1]) & 0xff;
-                int red = (pixels[pixel + 2]) & 0xff;
-                result[row][col] = ColourUtility.rgbToHex(red, green, blue);
+                int blue = ColourUtility.normalize((pixels[pixel]) & 0xff);
+                int green = ColourUtility.normalize((pixels[pixel + 1]) & 0xff);
+                int red = ColourUtility.normalize((pixels[pixel + 2]) & 0xff);
+                result[row][col] = new Color(red, green, blue);
             }
 
             col++;
