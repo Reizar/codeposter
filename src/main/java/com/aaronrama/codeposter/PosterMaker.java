@@ -86,6 +86,7 @@ public class PosterMaker {
         int imageWidth = poster.pixels[0].length;
         int imageHeight = poster.pixels.length;
 
+
         BufferedImage bi = new BufferedImage(posterWidth, posterHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D context = bi.createGraphics();
 
