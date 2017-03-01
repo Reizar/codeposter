@@ -79,10 +79,10 @@ public class PosterMaker {
             poster.codeCharacters = newChars;
         }
 
-        manuallyDrawImage();
+        drawImage();
     }
 
-    private void manuallyDrawImage() {
+    private void drawImage() {
         int imageWidth = poster.pixels[0].length;
         int imageHeight = poster.pixels.length;
 
