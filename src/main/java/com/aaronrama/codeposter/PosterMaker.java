@@ -69,6 +69,7 @@ public class PosterMaker {
 
         // Inefficiently pad the code characters list so that there is guaranteed to be enough
         // characters to cover each pixel.
+        // Todo Make this more efficient by only copying the required amount of characters.
         while ((poster.pixels.length * poster.pixels[0].length) > poster.codeCharacters.length) {
 
             String[] newChars = new String[poster.codeCharacters.length * 2];
