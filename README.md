@@ -27,7 +27,7 @@ __Input image:__ <br>
 ![Input Image](https://raw.githubusercontent.com/Reizar/codeposter/master/sample_input.png)
     
 __Output image:__ <br>
-![Input Image](https://raw.githubusercontent.com/Reizar/codeposter/master/sample_output.png)
+![Output Image](https://raw.githubusercontent.com/Reizar/codeposter/master/sample_output.png)
 
 ## Usage
 ```
